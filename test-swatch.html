@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Script Loading & Error Handling</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f9f9f9;
+      }
+
+      .test-section {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .status.success { background: #d4edda; color: #155724; }
+      .status.warning { background: #fff3cd; color: #856404; }
+      .status.error { background: #f8d7da; color: #721c24; }
+
+      .console-output {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test des Corrections d'Erreurs Shopify</h1>
+
+    <div class="test-section">
+      <h2>Status des Scripts</h2>
+      <div id="bootstrap-status" class="status">Bootstrap: Vérification...</div>
+      <div id="splide-status" class="status">Splide: Vérification...</div>
+      <div id="glightbox-status" class="status">GLightbox: Vérification...</div>
+    </div>
+
+    <div class="test-section">
+      <h2>Tests de Fonctionnalité</h2>
+      <button onclick="testBootstrap()">Test Bootstrap Modal</button>
+      <button onclick="testSplide()">Test Splide Slider</button>
+      <button onclick="testGLightbox()">Test GLightbox</button>
+    </div>
+
+    <div class="test-section">
+      <h2>Console Output</h2>
+      <div id="console-output" class="console-output">Chargement...</div>
+    </div>
+
+    <!-- Simulation des scripts Shopify avec erreurs potentielles -->
+    <script>
+      // Mock des objets Shopify pour le test
+      window.Shopify = {
+        shop: 'test-shop.myshopify.com',
+        designMode: false
+      };
+
+      // Intercepter les logs console pour les afficher
+      const consoleOutput = document.getElementById('console-output');
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+      const originalInfo = console.info;
+
+      let logs = [];
+
+      function addLog(type, args) {
+        const timestamp = new Date().toLocaleTimeString();
+        const message = Array.from(args).map(arg =>
+          typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+        ).join(' ');
+        logs.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+        updateConsoleOutput();
+      }
+
+      console.log = function() {
+        addLog('log', arguments);
+        originalLog.apply(console, arguments);
+      };
+      console.warn = function() {
+        addLog('warn', arguments);
+        originalWarn.apply(console, arguments);
+      };
+      console.error = function() {
+        addLog('error', arguments);
+        originalError.apply(console, arguments);
+      };
+      console.info = function() {
+        addLog('info', arguments);
+        originalInfo.apply(console, arguments);
+      };
+
+      function updateConsoleOutput() {
+        consoleOutput.textContent = logs.slice(-20).join('\n');
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+      }
+
+      // Simulation d'erreurs 404 et MIME type
+      setTimeout(() => {
+        console.error('Failed to load resource: the server responded with a status of 404 (bootstrap.js)');
+        console.error('Refused to execute script because "X-Content-Type-Options: nosniff" was given');
+        console.info('Initializing fallback systems...');
+      }, 1000);
+    </script>
+
+    <!-- Charger les scripts de fallback -->
+    <script src="assets/error-handler.js"></script>
+    <script src="assets/asset-fallbacks.js"></script>
+
+    <script>
+      // Tests de fonctionnalité
+      function testBootstrap() {
+        try {
+          if (typeof bootstrap !== 'undefined') {
+            const modal = bootstrap.Modal.getOrCreateInstance(document.createElement('div'));
+            console.info('Bootstrap test: SUCCESS - Modal créé');
+            document.getElementById('bootstrap-status').textContent = 'Bootstrap: ✅ LOADED';
+            document.getElementById('bootstrap-status').className = 'status success';
+          } else {
+            console.warn('Bootstrap test: FALLBACK - Utilisation du fallback');
+            document.getElementById('bootstrap-status').textContent = 'Bootstrap: ⚠️ FALLBACK';
+            document.getElementById('bootstrap-status').className = 'status warning';
+          }
+        } catch (error) {
+          console.error('Bootstrap test: ERROR -', error);
+          document.getElementById('bootstrap-status').textContent = 'Bootstrap: ❌ ERROR';
+          document.getElementById('bootstrap-status').className = 'status error';
+        }
+      }
+
+      function testSplide() {
+        try {
+          if (typeof Splide !== 'undefined') {
+            const splide = new Splide(document.createElement('div'));
+            console.info('Splide test: SUCCESS - Slider créé');
+            document.getElementById('splide-status').textContent = 'Splide: ✅ LOADED';
+            document.getElementById('splide-status').className = 'status success';
+          } else {
+            console.warn('Splide test: FALLBACK - Utilisation du fallback');
+            document.getElementById('splide-status').textContent = 'Splide: ⚠️ FALLBACK';
+            document.getElementById('splide-status').className = 'status warning';
+          }
+        } catch (error) {
+          console.error('Splide test: ERROR -', error);
+          document.getElementById('splide-status').textContent = 'Splide: ❌ ERROR';
+          document.getElementById('splide-status').className = 'status error';
+        }
+      }
+
+      function testGLightbox() {
+        try {
+          if (typeof GLightbox !== 'undefined') {
+            const lightbox = GLightbox();
+            console.info('GLightbox test: SUCCESS - Lightbox créé');
+            document.getElementById('glightbox-status').textContent = 'GLightbox: ✅ LOADED';
+            document.getElementById('glightbox-status').className = 'status success';
+          } else {
+            console.warn('GLightbox test: FALLBACK - Utilisation du fallback');
+            document.getElementById('glightbox-status').textContent = 'GLightbox: ⚠️ FALLBACK';
+            document.getElementById('glightbox-status').className = 'status warning';
+          }
+        } catch (error) {
+          console.error('GLightbox test: ERROR -', error);
+          document.getElementById('glightbox-status').textContent = 'GLightbox: ❌ ERROR';
+          document.getElementById('glightbox-status').className = 'status error';
+        }
+      }
+
+      // Tests automatiques au chargement
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          testBootstrap();
+          testSplide();
+          testGLightbox();
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>    <ul class="color-swatches">
+      <li>
+        <label class="swatch" data-pantone="pantone-186-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Rouge</span>
+          <span class="swatch-pantone">Pantone: pantone-186-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch" data-pantone="pantone-354-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Vert</span>
+          <span class="swatch-pantone">Pantone: pantone-354-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch" data-pantone="pantone-300-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Bleu</span>
+          <span class="swatch-pantone">Pantone: pantone-300-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch" data-pantone="pantone-process-black-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Noir</span>
+          <span class="swatch-pantone">Pantone: pantone-process-black-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch" data-pantone="pantone-7406-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Jaune</span>
+          <span class="swatch-pantone">Pantone: pantone-7406-c</span>
+        </label>
+      </li>
+    </ul>
+
+    <script src="assets/product.js"></script>
+  </body>
+</html>

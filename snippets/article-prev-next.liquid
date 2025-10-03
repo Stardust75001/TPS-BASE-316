@@ -1,0 +1,48 @@
+{% comment %}
+  Article Previous/Next Navigation Snippet
+
+  Usage:
+  {% render 'article-prev-next', blog: blog, article: article %}
+
+  Parameters:
+  - blog: The blog object
+  - article: The current article object
+{% endcomment %}
+
+{% if blog.previous_article or blog.next_article %}
+  <nav class="article-navigation mt-6 pt-6 border-top" aria-label="Article navigation">
+    <div class="row">
+      {% if blog.previous_article %}
+        <div class="col-md-6">
+          <div class="article-nav-item article-nav-prev">
+            <span class="article-nav-direction text-muted small d-block mb-2">
+              <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
+              {{ 'blogs.previous_post' | t }}
+            </span>
+            <h3 class="article-nav-title h6 mb-0">
+              <a href="{{ blog.previous_article.url }}" class="text-decoration-none">
+                {{ blog.previous_article.title | truncate: 60 }}
+              </a>
+            </h3>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if blog.next_article %}
+        <div class="col-md-6{% unless blog.previous_article %} offset-md-6{% endunless %}">
+          <div class="article-nav-item article-nav-next text-md-end">
+            <span class="article-nav-direction text-muted small d-block mb-2">
+              {{ 'blogs.next_post' | t }}
+              <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+            </span>
+            <h3 class="article-nav-title h6 mb-0">
+              <a href="{{ blog.next_article.url }}" class="text-decoration-none">
+                {{ blog.next_article.title | truncate: 60 }}
+              </a>
+            </h3>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </nav>
+{% endif %}

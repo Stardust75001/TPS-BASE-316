@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🧪 Test Système Hybride v2.0 + Améliorations ChatGPT</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #f5f5f5;
+      }
+      .test-section {
+        border: 2px solid #ddd;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        background: white;
+      }
+      .success {
+        border-color: #4caf50;
+        background-color: #f1f8e9;
+      }
+      .error {
+        border-color: #f44336;
+        background-color: #ffebee;
+      }
+      .warning {
+        border-color: #ff9800;
+        background-color: #fff3e0;
+      }
+      .info {
+        border-color: #2196f3;
+        background-color: #e3f2fd;
+      }
+      .log {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: monospace;
+        margin: 10px 0;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      button {
+        padding: 12px 20px;
+        margin: 8px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .btn-test {
+        background: #4caf50;
+        color: white;
+      }
+      .btn-force {
+        background: #ff9800;
+        color: white;
+      }
+      .btn-report {
+        background: #2196f3;
+        color: white;
+      }
+      .btn-clear {
+        background: #757575;
+        color: white;
+      }
+      .force-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .metric-card {
+        background: #e8f5e8;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2e7d32;
+      }
+      .metric-label {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🚀 Système Hybride v2.0 + Améliorations ChatGPT</h1>
+    <p>
+      <strong>Nouvelles fonctionnalités :</strong> Mode Force A/B, Performance
+      Tracking, Tableau de bord instantané
+    </p>
+
+    <!-- SECTION 1: Contrôles A/B Force Mode -->
+    <div class="test-section info">
+      <h2>🎛️ Contrôles A/B Force Mode (Suggestion ChatGPT)</h2>
+      <p>Forcer un mode spécifique pour tester les performances :</p>
+
+      <div class="force-controls">
+        <button class="btn-force" onclick="setForceMode('script')">
+          Force Script Src
+        </button>
+        <button class="btn-force" onclick="setForceMode('fetch')">
+          Force Fetch/Eval
+        </button>
+        <button class="btn-force" onclick="setForceMode('cdn')">
+          Force CDN Only
+        </button>
+        <button class="btn-force" onclick="setForceMode('fallback')">
+          Force Fallbacks
+        </button>
+        <button class="btn-clear" onclick="setForceMode(null)">
+          Mode Auto
+        </button>
+      </div>
+
+      <div id="force-status" class="log">
+        Mode actuel: AUTO (détection intelligente)
+      </div>
+    </div>
+
+    <!-- SECTION 2: Métriques Performance -->
+    <div class="test-section success">
+      <h2>📊 Métriques Performance en Temps Réel</h2>
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-value" id="total-time">--</div>
+          <div class="metric-label">Temps Total (ms)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="scripts-loaded">--</div>
+          <div class="metric-label">Scripts Chargés</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="fallbacks-used">--</div>
+          <div class="metric-label">Fallbacks Utilisés</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="success-rate">--</div>
+          <div class="metric-label">Taux Succès (%)</div>
+        </div>
+      </div>
+
+      <button class="btn-report" onclick="showPerformanceReport()">
+        📋 Rapport Détaillé
+      </button>
+      <button class="btn-test" onclick="runPerformanceTest()">
+        🔄 Nouveau Test
+      </button>
+    </div>
+
+    <!-- SECTION 3: Tests Scénarisés -->
+    <div class="test-section warning">
+      <h2>🧪 Scénarios de Test (5 min - Suggestion ChatGPT)</h2>
+      <div class="force-controls">
+        <button class="btn-test" onclick="runScenario('normal')">
+          1. Auto (prod)
+        </button>
+        <button class="btn-test" onclick="runScenario('script')">
+          2. Force "script"
+        </button>
+        <button class="btn-test" onclick="runScenario('fetch')">
+          3. Force "fetch"
+        </button>
+        <button class="btn-test" onclick="runScenario('cdn')">
+          4. Force "cdn"
+        </button>
+        <button class="btn-test" onclick="runScenario('fallback')">
+          5. Force "fallback"
+        </button>
+      </div>
+      <div id="scenario-results" class="log">
+        Cliquez sur un scénario pour commencer le test...
+      </div>
+    </div>
+
+    <!-- SECTION 4: Console & Debug -->
+    <div class="test-section">
+      <h2>🔍 Console Debug & KPIs</h2>
+      <button class="btn-clear" onclick="clearAllLogs()">
+        Nettoyer Console
+      </button>
+      <div id="console-output" class="log">Logs du système...</div>
+    </div>
+
+    <!-- Configuration système -->
+    <script>
+      window.assetUrls = {
+        bootstrap: "/assets/vendor-bootstrap.bundle.min.js",
+        splide: "/assets/vendor-splide.min.js",
+        glightbox: "/assets/vendor-glightbox.min.js",
+        general: "/assets/general.js",
+        search: "/assets/search.js",
+        sections: "/assets/sections.js",
+        collection: "/assets/collection.js",
+        product: "/assets/product.js",
+        cart: "/assets/cart.js",
+        custom: "/assets/custom.js",
+        stories: "/assets/stories-tooltips.js",
+      };
+      window.wishlistEnabled = true;
+    </script>
+
+    <!-- Système hybride v2 -->
+    <script src="/assets/asset-fallbacks.js"></script>
+    <script src="/assets/hybrid-script-loader-v2.js"></script>
+
+    <script>
+      let testResults = {};
+      let consoleOutput = document.getElementById("console-output");
+
+      // Intercepter console pour affichage
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+
+      function logToUI(type, ...args) {
+        const message = args.join(" ");
+        const timestamp = new Date().toLocaleTimeString();
+        const color =
+          type === "error"
+            ? "#d32f2f"
+            : type === "warn"
+            ? "#f57c00"
+            : "#1976d2";
+        consoleOutput.innerHTML += `<div style="color: ${color};">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+      }
+
+      console.log = function (...args) {
+        logToUI("info", ...args);
+        return originalLog.apply(console, args);
+      };
+
+      console.warn = function (...args) {
+        logToUI("warn", ...args);
+        return originalWarn.apply(console, args);
+      };
+
+      console.error = function (...args) {
+        logToUI("error", ...args);
+        return originalError.apply(console, args);
+      };
+
+      // Fonctions de contrôle
+      function setForceMode(mode) {
+        window.HYBRID_LOADER = window.HYBRID_LOADER || {};
+        window.HYBRID_LOADER.force = mode;
+
+        const status = document.getElementById("force-status");
+        status.innerHTML = `Mode actuel: ${
+          mode ? mode.toUpperCase() : "AUTO (détection intelligente)"
+        }`;
+
+        console.log(`🎛️ Force mode set to: ${mode || "auto"}`);
+        location.reload(); // Recharger pour appliquer
+      }
+
+      function showPerformanceReport() {
+        if (typeof window.hybridReport === "function") {
+          console.log("📊 === RAPPORT PERFORMANCE HYBRIDE ===");
+          window.hybridReport();
+          console.log("=====================================");
+        } else {
+          console.warn("⚠️ Rapport non disponible - système pas encore chargé");
+        }
+      }
+
+      function runPerformanceTest() {
+        console.log("🔄 Nouveau test de performance...");
+        location.reload();
+      }
+
+      function runScenario(scenario) {
+        console.log(`🧪 Démarrage scénario: ${scenario}`);
+        const results = document.getElementById("scenario-results");
+        results.innerHTML = `<div style="color: #1976d2;">🔄 Test en cours: ${scenario}...</div>`;
+
+        // Configurer le mode
+        if (scenario !== "normal") {
+          setForceMode(scenario);
+        } else {
+          setForceMode(null);
+        }
+      }
+
+      function clearAllLogs() {
+        consoleOutput.innerHTML = "Console nettoyée...";
+        console.log("🧹 Console cleared");
+      }
+
+      // Mise à jour métriques
+      function updateMetrics() {
+        if (
+          typeof window.hybridReport === "function" &&
+          performance.getEntriesByType
+        ) {
+          const entries = performance
+            .getEntriesByType("measure")
+            .filter((e) => e.name.startsWith("load:"));
+
+          const totalTime = Math.round(
+            entries.reduce((sum, e) => sum + e.duration, 0)
+          );
+          const scriptsLoaded = entries.length;
+          const successRate = scriptsLoaded > 0 ? 100 : 0;
+
+          document.getElementById("total-time").textContent = totalTime || "--";
+          document.getElementById("scripts-loaded").textContent =
+            scriptsLoaded || "--";
+          document.getElementById("fallbacks-used").textContent = "--";
+          document.getElementById("success-rate").textContent =
+            successRate + "%";
+        }
+      }
+
+      // Auto-update métriques
+      setInterval(updateMetrics, 2000);
+
+      // Log initial
+      setTimeout(() => {
+        console.log("🚀 Test interface v2.0 ready!");
+        console.log("💡 Utilisez les boutons pour tester les différents modes");
+        console.log("📊 Les métriques se mettent à jour automatiquement");
+        updateMetrics();
+      }, 1000);
+    </script>
+  </body>
+</html>

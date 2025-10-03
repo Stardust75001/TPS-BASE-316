@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Échantillonnage Couleur Pantone</title>
+    <style>
+      .color-swatches {
+        list-style: none;
+        display: flex;
+        gap: 15px;
+        padding: 20px;
+      }
+      .swatch {
+        display: block;
+        text-decoration: none;
+        color: black;
+        text-align: center;
+      }
+      .swatch-chip {
+        display: block;
+        width: 40px;
+        height: 40px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .swatch-label {
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .swatch-pantone {
+        font-size: 10px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      /* Additional styles for inline elements */
+      .swatch-chip.no-color {
+        background: #ccc;
+      }
+
+      .console-container {
+        margin: 20px;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+
+      #console-output {
+        font-family: monospace;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Échantillonnage Couleur depuis Images Produit</h1>
+    <p>
+      Les pastilles doivent se colorer avec les couleurs échantillonnées des
+      images produit
+    </p>
+
+    <ul class="color-swatches">
+      <li>
+        <label
+          class="swatch"
+          data-media-url="https://images.unsplash.com/photo-1558618047-e77da85c4e5f?w=300&h=300&fit=crop"
+          data-pantone="pantone-186-c"
+        >
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Rouge (Image test)</span>
+          <span class="swatch-pantone">Pantone: pantone-186-c</span>
+        </label>
+      </li>
+      <li>
+        <label
+          class="swatch"
+          data-media-url="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=300&fit=crop"
+          data-pantone="pantone-300-c"
+        >
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Bleu (Image test)</span>
+          <span class="swatch-pantone">Pantone: pantone-300-c</span>
+        </label>
+      </li>
+      <li>
+        <label
+          class="swatch"
+          data-media-url="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop"
+          data-pantone="pantone-354-c"
+        >
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Vert (Image test)</span>
+          <span class="swatch-pantone">Pantone: pantone-354-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch" data-pantone="pantone-purple-c">
+          <span class="swatch-chip"></span>
+          <span class="swatch-label">Violet (Pantone seulement)</span>
+          <span class="swatch-pantone">Pantone: pantone-purple-c</span>
+        </label>
+      </li>
+      <li>
+        <label class="swatch">
+          <span class="swatch-chip no-color"></span>
+          <span class="swatch-label">Sans couleur</span>
+          <span class="swatch-pantone">Aucune source (CSS par défaut)</span>
+        </label>
+      </li>
+    </ul>
+
+    <div class="console-container">
+      <h3>Console Logs:</h3>
+      <div id="console-output"></div>
+    </div>
+
+    <script>
+      // Intercepter les console.log pour les afficher sur la page
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+      const outputDiv = document.getElementById("console-output");
+
+      function addToOutput(type, ...args) {
+        const div = document.createElement("div");
+        div.style.color =
+          type === "error" ? "red" : type === "warn" ? "orange" : "black";
+        div.textContent = `[${type.toUpperCase()}] ${args.join(" ")}`;
+        outputDiv.appendChild(div);
+      }
+
+      console.log = (...args) => {
+        originalLog(...args);
+        addToOutput("log", ...args);
+      };
+      console.warn = (...args) => {
+        originalWarn(...args);
+        addToOutput("warn", ...args);
+      };
+      console.error = (...args) => {
+        originalError(...args);
+        addToOutput("error", ...args);
+      };
+    </script>
+
+    <script src="assets/product.js"></script>
+  </body>
+</html>

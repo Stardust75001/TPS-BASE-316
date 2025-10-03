@@ -1,0 +1,178 @@
+{% liquid
+  assign mt = block.settings.mt | prepend: 'mt-'
+  assign mb = block.settings.mb | prepend: 'mb-'
+%}
+
+{% unless product.has_only_default_variant %}
+  <div class="product-variant-selector {{ mt }} {{ mb }}" {{ block.shopify_attributes }}>
+    <ul
+      class="product-options list-unstyled mb-6"
+      aria-label="{{ 'product.product_options' | t }}"
+    >
+      {% for option in product.options_with_values %}
+        <div class="product-option-wrapper">
+          {% liquid
+            assign option_name_lower = option.name | downcase
+            assign is_color = false
+            assign is_size = false
+            assign is_material = false
+
+            if option_name_lower contains 'couleur' or option_name_lower contains 'color' or option_name_lower contains 'colour'
+              assign is_color = true
+            elsif option_name_lower contains 'taille' or option_name_lower contains 'size'
+              assign is_size = true
+            elsif option_name_lower contains 'matériel' or option_name_lower contains 'material' or option_name_lower contains 'matiere'
+              assign is_material = true
+            endif
+          %}
+
+          {% comment %} Afficher seulement les couleurs et tailles, pas les matériels {% endcomment %}
+          {% unless is_material %}
+            {% if is_color and settings.color_swatches_show %}
+              <h4
+                class="color-swatches-title title d-flex h6 mb-3"
+                aria-hidden="true"
+              >
+                {{ option.name }}:
+                <span class="text-muted ms-2">
+                  {{ option.selected_value }}
+                </span>
+              </h4>
+              <ul class="color-swatches list-unstyled mx-n1 mb-5" aria-label="{{ option.name }}">
+                {% for value in option.values %}
+                  {%- assign pantone_handle = '' -%}
+                  {%- capture pantone_tmp -%}{% render 'pantone-map', color: value, expose: 'pantone_handle' %}{%- endcapture -%}
+                  {%- assign pantone_handle = pantone_tmp | strip -%}
+                  {% assign swatch_variant = null %}
+                  {% assign option_position = option.position | minus: 1 %}
+                  {% for variant in product.variants %}
+                    {% if variant.options[option_position] == value %}
+                      {% assign swatch_variant = variant %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if swatch_variant %}
+                    {% if swatch_variant.featured_media %}
+                      {% assign media_url = swatch_variant.featured_media
+                        | image_url: width: 128, height: 128, crop: 'center'
+                      %}
+                      {% assign media_id = swatch_variant.featured_media.id %}
+                    {% elsif swatch_variant.image %}
+                      {% assign media_url = swatch_variant.image | image_url: width: 128, height: 128, crop: 'center' %}
+                      {% assign media_id = swatch_variant.image.id %}
+                    {% else %}
+                      {% assign media_url = '' %}
+                      {% assign media_id = '' %}
+                    {% endif %}
+                  {% else %}
+                    {% assign media_url = '' %}
+                    {% assign media_id = '' %}
+                  {% endif %}
+                  <li class="p-1">
+                    <input
+                      class="product-option visually-hidden"
+                      type="radio"
+                      name="option-{{ option.name | handleize }}"
+                      id="option-{{ option.name | handleize }}-{{ value | handleize }}"
+                      value="{{ value | escape }}"
+                      data-product-id="{{ product.id }}"
+                      onchange="handleProductOptionChange(this, event)"
+                      {% if option.selected_value == value %}
+                        checked
+                      {% endif %}
+                    >
+                    <label
+                      data-bs-toggle="tooltip"
+                      title="{{ value | escape }}"
+                      for="option-{{ option.name | handleize }}-{{ value | handleize }}"
+                      class="swatch"
+                      data-media-url="{{ media_url }}"
+                      data-variant-id="{{ swatch_variant.id }}"
+                      data-media-id="{{ media_id }}"
+                      {% if swatch_variant.metafields.custom.color_pantone.value.handle %}
+                        data-pantone="{{ swatch_variant.metafields.custom.color_pantone.value.handle }}"
+                      {% elsif pantone_handle != blank %}
+                        data-pantone="{{ pantone_handle }}"
+                      {% endif %}
+                    >
+                      <span class="swatch-chip" aria-hidden="true"></span>
+                      <span class="swatch-label">{{ value }}</span>
+                      {% if swatch_variant
+                        and swatch_variant.metafields
+                        and swatch_variant.metafields.custom
+                        and swatch_variant.metafields.custom.color_pantone
+                        and swatch_variant.metafields.custom.color_pantone.type == 'metaobject_reference'
+                      %}
+                        <span class="swatch-pantone" style="display:block;font-size:0.7em;color:#888;"
+                          >Pantone: {{ swatch_variant.metafields.custom.color_pantone.value.handle -}}
+                        </span>
+                      {% elsif pantone_handle != blank %}
+                        <span class="swatch-pantone" style="display:block;font-size:0.7em;color:#888;"
+                          >Pantone: {{ pantone_handle -}}
+                        </span>
+                      {% endif %}
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% elsif is_size and settings.size_buttons_show %}
+              <h4 class="size-buttons-title title d-flex h6 mb-2" aria-hidden="true">
+                {{ option.name }}:
+                <span class="text-muted ms-3">
+                  {{ option.selected_value }}
+                </span>
+              </h4>
+              <ul class="size-buttons list-unstyled mx-n2 mb-4" aria-label="{{ option.name }}">
+                {% for value in option.values %}
+                  {% assign size_variant = null %}
+                  {% assign option_position = option.position | minus: 1 %}
+                  {% for variant in product.variants %}
+                    {% if variant.options[option_position] == value %}
+                      {% assign size_variant = variant %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if size_variant %}
+                    {% if size_variant.featured_media %}
+                      {% assign media_id = size_variant.featured_media.id %}
+                    {% elsif size_variant.image %}
+                      {% assign media_id = size_variant.image.id %}
+                    {% else %}
+                      {% assign media_id = '' %}
+                    {% endif %}
+                  {% else %}
+                    {% assign media_id = '' %}
+                  {% endif %}
+                  <li class="p-1">
+                    <input
+                      class="product-option visually-hidden"
+                      type="radio"
+                      name="option-{{ option.name | handleize }}"
+                      id="option-{{ option.name | handleize }}-{{ value | handleize }}"
+                      value="{{ value | escape }}"
+                      data-product-id="{{ product.id }}"
+                      data-variant-id="{{ size_variant.id }}"
+                      data-media-id="{{ media_id }}"
+                      onchange="handleProductOptionChange(this, event)"
+                      {% if option.selected_value == value %}
+                        checked
+                      {% endif %}
+                    >
+                    <label
+                      data-bs-toggle="tooltip"
+                      title="{{ value | escape }}"
+                      for="option-{{ option.name | handleize }}-{{ value | handleize }}"
+                      class="size-button"
+                    >
+                      <span class="size-label">{{ value }}</span>
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endunless %}
+        </div>
+      {% endfor %}
+    </ul>
+  </div>
+{% endunless %}

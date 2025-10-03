@@ -1,0 +1,65 @@
+Checking . ...
+[DEPRECATION] Template.register_tag is deprecated. Use Environment#register_tag instead. Called from /Users/asc/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/theme-check-1.15.0/lib/theme_check/tags.rb:214:in `register_tag'
+[34msections/map.liquid:34[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map.address' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map.address' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:41[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map.phone' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map.phone' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:48[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map.email' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map.email' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:55[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map.hours' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map.hours' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:83[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map.api_key_missing' does not have a matching entry in 'locales/en.default.json'.
+	<p class="text-muted">{{ 'general.map.api_key_missing' | t }}</p>
+	                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:30[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search.title_products' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search.title_products' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:133[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search.title_collections' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search.title_collections' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:152[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search.title_pages' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search.title_pages' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:171[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search.title_articles' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search.title_articles' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34mfinal_theme_check.json[0m: [31merror[0m: [33mValidJson[0m: Invalid syntax in JSON.
+
+[34mtheme_results.json[0m: [31merror[0m: [33mValidJson[0m: Invalid syntax in JSON.
+
+[34msections/stories-bar-sticky-dynamic.liquid:67[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<img
+
+[34msections/template-tracking.liquid:52[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<script src="https://www.17track.net/externalcall.js" defer></script>
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msnippets/analytics-tracking.liquid:31[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.ga4_id }}"></script>
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msnippets/analytics-tracking.liquid:100[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<img
+
+[34msnippets/turnstile.liquid:87[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34mtemplates/gift_card.liquid:24[0m: [35msuggestion[0m: [33mRemoteAsset[0m: Asset should be served by the Shopify CDN for better performance..
+	<link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+337 files inspected, [31m17 offenses[0m detected, [33m9 offenses[0m auto-correctable

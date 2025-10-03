@@ -1,0 +1,27 @@
+node_modules
+node_modules/
+.shopify/
+.DS_Store
+*.log
+.env*
+.env*
+.env*
+.logs/
+node_modules/
+dist/
+build/
+.github/
+assets/**/*.min.css
+assets/**/*.min.js
+assets/**/vendor-**/
+assets/vendor-*.css
+assets/vendor-*.js
+# never commit debug/test scripts that may contain creds
+debug-metaobjects.js
+import-colors-corrected.cjs
+import-colors-final.cjs
+test-node-api.js
+test-simple.cjs
+# also ignore dotenv files/locals
+.env
+.env.*

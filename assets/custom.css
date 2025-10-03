@@ -1,0 +1,12 @@
+/* Custom CSS - Ajout de styles personnalisés */
+
+.custom-element {
+  /* Style personnalisé pour éléments custom */
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Placeholder pour styles futurs */
+.placeholder {
+  display: none;
+}

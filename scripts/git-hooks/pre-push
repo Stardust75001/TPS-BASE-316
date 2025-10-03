@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+LIVE_ID="${LIVE_THEME_ID:-}"
+STORE="${SHOPIFY_CLI_STORE:-}"
+SETTINGS_PATH="config/settings_data.json"
+
+[ -n "${SKIP_THEME_SYNC_CHECK:-}" ] && exit 0
+[ -z "$STORE" ] && exit 0
+command -v shopify >/dev/null || exit 0
+[ -f "$SETTINGS_PATH" ] || exit 0
+
+if [ -z "$LIVE_ID" ]; then
+  LIVE_ID=$(shopify theme list --store "$STORE" --json 2>/dev/null | jq -r '.themes[] | select(.role=="main") | .id')
+fi
+[ -z "$LIVE_ID" ] && exit 0
+
+echo "[pre-push] Sync check settings_data.json vs live ($LIVE_ID)" >&2
+if shopify theme pull --store "$STORE" --theme "$LIVE_ID" --only "$SETTINGS_PATH" --json >/dev/null 2>&1; then
+  if ! git diff --quiet -- "$SETTINGS_PATH"; then
+    echo "[pre-push] settings_data.json mis à jour après pull. Committe-le d'abord." >&2
+    echo "         (export SKIP_THEME_SYNC_CHECK=1 pour forcer)" >&2
+    exit 1
+  fi
+fi
+exit 0

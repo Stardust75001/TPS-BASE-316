@@ -1,0 +1,352 @@
+{%- comment -%}
+  SNIPPET DE TEST COMPLET POUR SYSTÈME COULEURS
+  
+  Ce snippet peut être ajouté dans templates/product.liquid pour tester
+  le système de variantes couleur avec les metaobjects.
+{%- endcomment -%}
+
+<div class="color-system-test-wrapper">
+  <h2 style="border-bottom: 2px solid #333; padding-bottom: 10px;">
+    🌈 Test du Système Variantes Couleur
+  </h2>
+  
+  <!-- Test 1: Vérification des metaobjects -->
+  <div class="test-section">
+    <h3>📊 1. État des Metaobjects Colors</h3>
+    {% if shop.metaobjects.colors %}
+      <div class="success-message">
+        ✅ <strong>Metaobject 'colors' détecté</strong><br>
+        📈 Nombre de couleurs disponibles: <strong>{{ shop.metaobjects.colors.values.size }}</strong>
+      </div>
+      
+      <!-- Aperçu rapide des couleurs -->
+      {% if shop.metaobjects.colors.values.size > 0 %}
+        <h4>🎨 Aperçu des couleurs (premiers 10):</h4>
+        <div class="color-preview-grid">
+          {% for color in shop.metaobjects.colors.values limit: 10 %}
+            <div class="color-preview-item" title="{{ color.display_name.value }} - {{ color.hex_value.value }}">
+              <div 
+                class="color-circle" 
+                style="background-color: {{ color.hex_value.value | default: '#cccccc' }};"
+              ></div>
+              <small>{{ color.display_name.value | truncate: 8 }}</small>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="error-message">
+        ❌ <strong>Metaobject 'colors' non trouvé</strong><br>
+        ⚠️ Veuillez créer le metaobject et importer les données CSV.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Test 2: Analyse du produit actuel -->
+  <div class="test-section">
+    <h3>🛍️ 2. Analyse du Produit Actuel</h3>
+    {% if product %}
+      <p><strong>Produit:</strong> {{ product.title }}</p>
+      <p><strong>Nombre de variantes:</strong> {{ product.variants.size }}</p>
+      
+      {% if product.variants.size > 0 %}
+        <h4>🔍 Analyse des variantes:</h4>
+        <div class="variants-analysis">
+          {% for variant in product.variants limit: 8 %}
+            <div class="variant-item">
+              <strong>{{ variant.title }}</strong>
+              <div class="variant-options">
+                {% if variant.option1 %}
+                  <span class="option-badge">Option 1: {{ variant.option1 }}</span>
+                {% endif %}
+                {% if variant.option2 %}
+                  <span class="option-badge">Option 2: {{ variant.option2 }}</span>
+                {% endif %}
+                {% if variant.option3 %}
+                  <span class="option-badge">Option 3: {{ variant.option3 }}</span>
+                {% endif %}
+              </div>
+              
+              <!-- Test de correspondance avec les couleurs -->
+              {%- assign color_found = false -%}
+              {%- for i in (1..3) -%}
+                {%- assign option_value = '' -%}
+                {%- case i -%}
+                  {%- when 1 -%}
+                    {%- assign option_value = variant.option1 -%}
+                  {%- when 2 -%}
+                    {%- assign option_value = variant.option2 -%}
+                  {%- when 3 -%}
+                    {%- assign option_value = variant.option3 -%}
+                {%- endcase -%}
+                
+                {%- if option_value and option_value != blank and color_found == false -%}
+                  {%- assign option_lower = option_value | downcase -%}
+                  {%- for color in shop.metaobjects.colors.values -%}
+                    {%- assign css_name_lower = color.css_name.value | default: '' | downcase -%}
+                    {%- assign display_name_lower = color.display_name.value | default: '' | downcase -%}
+                    
+                    {%- if css_name_lower == option_lower or display_name_lower == option_lower -%}
+                      <div class="color-match">
+                        ✅ <strong>Couleur trouvée:</strong> {{ color.display_name.value }}
+                        <div 
+                          class="matched-color-swatch" 
+                          style="background-color: {{ color.hex_value.value }};"
+                          title="{{ color.hex_value.value }}"
+                        ></div>
+                      </div>
+                      {%- assign color_found = true -%}
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+                
+                {%- if color_found -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+              
+              {%- unless color_found -%}
+                <div class="no-color-match">
+                  ⚠️ Aucune couleur correspondante trouvée
+                </div>
+              {%- endunless -%}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>ℹ️ Ce produit n'a pas de variantes.</p>
+      {% endif %}
+    {% else %}
+      <div class="warning-message">
+        ⚠️ Aucun produit dans le contexte. Ce test doit être placé dans un template de produit.
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Test 3: Système de sélection couleur -->
+  {% if product and product.variants.size > 0 %}
+    <div class="test-section">
+      <h3>🎯 3. Test du Système de Sélection</h3>
+      <p>Sélecteur de couleurs basé sur les metaobjects:</p>
+      
+      {% render 'product-color-variants', product: product %}
+      
+      {% if shop.metaobjects.colors.values.size == 0 %}
+        <div class="error-message">
+          ❌ Le snippet de sélection ne fonctionnera pas car aucune couleur n'est disponible dans les metaobjects.
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Test 4: Instructions de débogage -->
+  <div class="test-section">
+    <h3>🔧 4. Informations de Débogage</h3>
+    <div class="debug-info">
+      <p><strong>Date du test:</strong> {{ 'now' | date: '%Y-%m-%d %H:%M:%S' }}</p>
+      <p><strong>Store:</strong> {{ shop.name }}</p>
+      <p><strong>Thème:</strong> {{ theme.name | default: 'N/A' }}</p>
+      {% if shop.metaobjects.colors %}
+        <p><strong>Metaobject colors:</strong> {{ shop.metaobjects.colors.values.size }} entrées</p>
+        {% if shop.metaobjects.colors.values.size > 0 %}
+          <p><strong>Première couleur (test):</strong></p>
+          <ul>
+            <li>Display Name: {{ shop.metaobjects.colors.values.first.display_name.value }}</li>
+            <li>Hex Value: {{ shop.metaobjects.colors.values.first.hex_value.value }}</li>
+            <li>CSS Name: {{ shop.metaobjects.colors.values.first.css_name.value }}</li>
+            <li>Handle: {{ shop.metaobjects.colors.values.first.handle }}</li>
+          </ul>
+        {% endif %}
+      {% else %}
+        <p><strong>Status:</strong> Metaobject colors non disponible</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Instructions -->
+  <div class="test-section">
+    <h3>📋 5. Instructions</h3>
+    <div class="instructions">
+      <h4>Si le test échoue:</h4>
+      <ol>
+        <li>Vérifiez que le metaobject 'colors' est créé dans Admin → Custom Data</li>
+        <li>Assurez-vous que les données CSV ont été importées</li>
+        <li>Vérifiez le mapping des champs: Name → display_name, Hex → hex_value, Code → css_name</li>
+        <li>Contrôlez que les noms de variantes correspondent aux couleurs CSS</li>
+      </ol>
+      
+      <h4>Pour intégrer en production:</h4>
+      <ol>
+        <li>Supprimez ce snippet de test</li>
+        <li>Gardez seulement: <code>{% raw %}{% render 'product-color-variants', product: product %}{% endraw %}</code></li>
+        <li>Personnalisez les styles CSS selon votre thème</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<style>
+.color-system-test-wrapper {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fafafa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.test-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.test-section h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.success-message {
+  background: #e8f5e8;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  padding: 12px;
+  color: #2e7d2e;
+}
+
+.error-message {
+  background: #ffeaea;
+  border: 1px solid #f44336;
+  border-radius: 6px;
+  padding: 12px;
+  color: #c62828;
+}
+
+.warning-message {
+  background: #fff8e1;
+  border: 1px solid #ff9800;
+  border-radius: 6px;
+  padding: 12px;
+  color: #ef6c00;
+}
+
+.color-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.color-preview-item {
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.color-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 auto 5px;
+  border: 2px solid #ddd;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.variants-analysis {
+  display: grid;
+  gap: 15px;
+}
+
+.variant-item {
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.variant-options {
+  margin: 8px 0;
+}
+
+.option-badge {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.color-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px;
+  background: #e8f5e8;
+  border-radius: 6px;
+}
+
+.matched-color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.no-color-match {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff3e0;
+  border-radius: 6px;
+  color: #ef6c00;
+}
+
+.debug-info {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.instructions {
+  line-height: 1.6;
+}
+
+.instructions ol {
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin-bottom: 8px;
+}
+
+.instructions code {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+@media (max-width: 768px) {
+  .color-system-test-wrapper {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .color-preview-grid {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+}
+</style>

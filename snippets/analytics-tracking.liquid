@@ -1,0 +1,108 @@
+{% comment %}
+  Analytics & Tracking Services
+  - Google Tag Manager
+  - Google Analytics 4 (fallback if no GTM)
+  - Facebook/Meta Pixel
+
+  Utilise la configuration centralisée depuis analytics-config.liquid
+{% endcomment %}
+
+{%- comment -%} Google Tag Manager {%- endcomment -%}
+{% if settings.gtm_id != blank %}
+  <!-- Google Tag Manager -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s),
+        dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', '{{ settings.gtm_id }}');
+  </script>
+  <!-- End Google Tag Manager -->
+{% endif %}
+
+{%- comment -%} Google Analytics 4 (Fallback if no GTM) {%- endcomment -%}
+{% if settings.ga4_id != blank and settings.gtm_id == blank %}
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.ga4_id }}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '{{ settings.ga4_id }}', {
+      'send_page_view': true,
+      'enhanced_conversions': true
+    });
+
+    // Enhanced Ecommerce Events
+    {% if request.page_type == 'product' %}
+      // View Item
+      gtag('event', 'view_item', {
+        'currency': '{{ cart.currency.iso_code }}',
+        'value': {{ product.price | divided_by: 100.0 }},
+        'items': [{
+          'item_id': '{{ product.id }}',
+          'item_name': {{ product.title | json }},
+          'item_category': '{{ product.type }}',
+          'item_brand': '{{ product.vendor }}',
+          'price': {{ product.price | divided_by: 100.0 }},
+          'quantity': 1
+        }]
+      });
+    {% elsif request.page_type == 'collection' %}
+      // View Item List
+      gtag('event', 'view_item_list', {
+        'item_list_id': '{{ collection.id }}',
+        'item_list_name': {{ collection.title | json }}
+      });
+    {% endif %}
+  </script>
+{% endif %}
+
+{%- comment -%} Facebook/Meta Pixel {%- endcomment -%}
+{% if settings.facebook_pixel_id != blank %}
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '{{ settings.facebook_pixel_id }}');
+    fbq('track', 'PageView');
+
+    // Enhanced Ecommerce Events
+    {% if request.page_type == 'product' %}
+      // ViewContent
+      fbq('track', 'ViewContent', {
+        content_type: 'product',
+        content_ids: ['{{ product.id }}'],
+        content_name: {{ product.title | json }},
+        content_category: '{{ product.type }}',
+        value: {{ product.price | divided_by: 100.0 }},
+        currency: '{{ cart.currency.iso_code }}'
+      });
+    {% elsif request.page_type == 'collection' %}
+      // ViewCategory
+      fbq('track', 'ViewCategory', {
+        content_category: {{ collection.title | json }}
+      });
+    {% endif %}
+  </script>
+  <noscript>
+    <img
+      height="1"
+      width="1"
+      style="display:none"
+      src="https://www.facebook.com/tr?id={{ settings.facebook_pixel_id }}&ev=PageView&noscript=1"
+    >
+  </noscript>
+  <!-- End Meta Pixel Code -->
+{% endif %}

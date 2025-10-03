@@ -1,0 +1,392 @@
+{%- comment -%}
+  SNIPPET: VARIANTES COULEUR AVEC METAOBJECTS
+
+  Utilisation dans vos templates produit:
+  {% render 'product-color-variants', product: product %}
+
+  Prérequis:
+  - Metaobject 'colors' créé avec les champs: display_name, hex_value, css_name
+  - Import des couleurs CSS effectué
+{%- endcomment -%}
+
+{%- liquid
+  assign color_variants = product.variants | where: 'available', true
+  assign has_color_variants = false
+
+  # Vérifier si des variantes ont des couleurs correspondantes dans les metaobjects
+  for variant in color_variants
+    assign found_color = false
+
+    # Chercher dans les options de variantes
+    for i in (1..3)
+      assign option_value = ''
+      case i
+        when 1
+          assign option_value = variant.option1
+        when 2
+          assign option_value = variant.option2
+        when 3
+          assign option_value = variant.option3
+      endcase
+
+      if option_value and option_value != blank
+        # Chercher la couleur dans les metaobjects
+        assign color_handle = option_value | handleize
+        assign color_lower = option_value | downcase
+
+        for metaobject in shop.metaobjects.colors.values
+          assign meta_css_name = metaobject.css_name.value | default: '' | downcase
+          assign meta_display_name = metaobject.display_name.value | default: '' | downcase
+
+          if meta_css_name == color_lower or meta_display_name == color_lower or metaobject.handle == color_handle
+            assign found_color = true
+            break
+          endif
+        endfor
+
+        if found_color
+          break
+        endif
+      endif
+    endfor
+
+    if found_color
+      assign has_color_variants = true
+      break
+    endif
+  endfor
+-%}
+{% if has_color_variants %}
+  <div class="product-color-variants" data-product-id="{{ product.id }}">
+    <div class="color-variants-header">
+      <h4 class="color-variants-title">
+        {{ 'products.color_variants.choose_color' | t | default: 'Choose Color' }}
+      </h4>
+      <span class="selected-color-name" id="selected-color-{{ product.id }}">
+        {{ 'products.color_variants.select_option' | t | default: 'Select a color' }}
+      </span>
+    </div>
+
+    <div class="color-swatches-grid" role="radiogroup" aria-labelledby="color-variants-title">
+      {% for variant in color_variants limit: 50 %}
+        {%- liquid
+          # Trouver la couleur correspondante dans les metaobjects pour cette variante
+          assign color_value = ''
+          assign color_metaobject = null
+          assign found_color_option = false
+
+          # Chercher dans toutes les options de la variante
+          for i in (1..3)
+            assign option_value = ''
+            case i
+              when 1
+                assign option_value = variant.option1
+              when 2
+                assign option_value = variant.option2
+              when 3
+                assign option_value = variant.option3
+            endcase
+
+            if option_value and option_value != blank and found_color_option == false
+              assign color_lower = option_value | downcase
+              assign color_handle = option_value | handleize
+
+              # Chercher dans les metaobjects colors
+              for metaobject in shop.metaobjects.colors.values
+                assign meta_css_name = metaobject.css_name.value | default: '' | downcase
+                assign meta_display_name = metaobject.display_name.value | default: '' | downcase
+                assign meta_handle = metaobject.handle | default: '' | downcase
+
+                if meta_css_name == color_lower or meta_display_name == color_lower or meta_handle == color_handle
+                  assign color_value = option_value
+                  assign color_metaobject = metaobject
+                  assign found_color_option = true
+                  break
+                endif
+              endfor
+            endif
+
+            if found_color_option
+              break
+            endif
+          endfor
+
+          # Si aucune couleur trouvée dans les metaobjects, ignorer cette variante
+          unless found_color_option
+            continue
+          endunless
+        -%}
+        {% unless color_variants_added contains variant.id %}
+          {% assign color_variants_added = color_variants_added | append: variant.id | append: ',' %}
+
+          <div class="color-swatch-container">
+            <input
+              type="radio"
+              name="color-variant-{{ product.id }}"
+              id="color-{{ product.id }}-{{ variant.id }}"
+              value="{{ variant.id }}"
+              class="color-variant-input sr-only"
+              data-variant-id="{{ variant.id }}"
+              data-color-name="{{ color_value | default: variant.title }}"
+              {% if forloop.first %}
+                checked
+              {% endif %}
+            >
+
+            <label
+              for="color-{{ product.id }}-{{ variant.id }}"
+              class="color-swatch-label"
+              title="{{ color_value | default: variant.title }} - {{ variant.price | money }}"
+            >
+              {% if color_metaobject and color_metaobject.hex_value.value %}
+                <span
+                  class="color-swatch color-swatch-circle"
+                  style="background-color: {{ color_metaobject.hex_value.value }};"
+                  data-color="{{ color_metaobject.hex_value.value }}"
+                ></span>
+              {% else %}
+                <span class="color-swatch color-swatch-text">
+                  {{ color_value | default: variant.title | truncate: 10 }}
+                </span>
+              {% endif %}
+
+              <span class="color-name-label">
+                {{ color_value | default: variant.title }}
+              </span>
+            </label>
+          </div>
+        {% endunless %}
+      {% endfor %}
+    </div>
+
+    <div class="color-variant-info">
+      <span class="variant-price" id="variant-price-{{ product.id }}">
+        {% if product.selected_or_first_available_variant %}
+          {{ product.selected_or_first_available_variant.price | money }}
+        {% endif %}
+      </span>
+      <span class="variant-availability" id="variant-availability-{{ product.id }}">
+        {% if product.selected_or_first_available_variant.available %}
+          {{ 'products.variant.in_stock' | t | default: 'In stock' }}
+        {% else %}
+          {{ 'products.variant.out_of_stock' | t | default: 'Out of stock' }}
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <style>
+    .product-color-variants {
+      margin: 20px 0;
+    }
+
+    .color-variants-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .color-variants-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .selected-color-name {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .color-swatches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .color-swatch-container {
+      position: relative;
+    }
+
+    .color-variant-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .color-swatch-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .color-swatch-label:hover {
+      border-color: #ddd;
+      background-color: #f9f9f9;
+    }
+
+    .color-variant-input:checked + .color-swatch-label {
+      border-color: #333;
+      background-color: #f5f5f5;
+    }
+
+    .color-swatch {
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .color-swatch-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #ddd;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .color-swatch-text {
+      padding: 12px 16px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      min-width: 60px;
+    }
+
+    .color-name-label {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .color-variant-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+
+    .variant-price {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .variant-availability {
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .variant-availability:contains('In stock') {
+      color: #006400;
+      background-color: #e6ffe6;
+    }
+
+    .variant-availability:contains('Out of stock') {
+      color: #cc0000;
+      background-color: #ffe6e6;
+    }
+
+    @media (max-width: 768px) {
+      .color-swatches-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+      }
+
+      .color-swatch-circle {
+        width: 32px;
+        height: 32px;
+      }
+
+      .color-name-label {
+        font-size: 12px;
+      }
+    }
+  </style>
+
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const productId = {{ product.id }};
+  const colorInputs = document.querySelectorAll(`input[name="color-variant-${productId}"]`);
+  const selectedColorName = document.getElementById(`selected-color-${productId}`);
+  const variantPrice = document.getElementById(`variant-price-${productId}`);
+  const variantAvailability = document.getElementById(`variant-availability-${productId}`);
+
+  // Données des variantes (générées côté serveur)
+  const variants = {
+    {% for variant in product.variants %}
+    {{ variant.id }}: {
+      price: "{{ variant.price | money }}",
+      available: {{ variant.available }},
+      title: "{{ variant.title | escape }}"
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  };
+
+  function updateVariantInfo(variantId) {
+    const variant = variants[variantId];
+    if (!variant) return;
+
+    // Mettre à jour le prix
+    if (variantPrice) {
+      variantPrice.textContent = variant.price;
+    }
+
+    // Mettre à jour la disponibilité
+    if (variantAvailability) {
+      variantAvailability.textContent = variant.available ?
+        '{{ "products.variant.in_stock" | t | default: "In stock" }}' :
+        '{{ "products.variant.out_of_stock" | t | default: "Out of stock" }}';
+
+      variantAvailability.className = `variant-availability ${variant.available ? 'in-stock' : 'out-of-stock'}`;
+    }
+
+    // Déclencher l'événement de changement de variante pour le reste du thème
+    const event = new CustomEvent('variant:change', {
+      detail: { variantId, variant }
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Écouter les changements de sélection
+  colorInputs.forEach(input => {
+    input.addEventListener('change', function() {
+      if (this.checked) {
+        const colorName = this.dataset.colorName;
+        const variantId = this.dataset.variantId;
+
+        // Mettre à jour le nom de couleur affiché
+        if (selectedColorName) {
+          selectedColorName.textContent = colorName;
+        }
+
+        // Mettre à jour les informations de variante
+        updateVariantInfo(variantId);
+
+        // Mettre à jour le formulaire d'achat principal
+        const mainVariantSelect = document.querySelector('[name="id"]');
+        if (mainVariantSelect) {
+          mainVariantSelect.value = variantId;
+        }
+      }
+    });
+  });
+
+  // Initialiser avec la première variante
+  if (colorInputs.length > 0) {
+    const firstInput = colorInputs[0];
+    selectedColorName.textContent = firstInput.dataset.colorName;
+    updateVariantInfo(firstInput.dataset.variantId);
+  }
+});
+  </script>
+{% endif %}

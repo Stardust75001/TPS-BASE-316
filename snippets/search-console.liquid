@@ -1,0 +1,31 @@
+{% comment %}
+  Search Console + Analytics meta tags
+  - Outputs the Google Search Console verification meta tag (if present in theme settings or shop metafields)
+  - Exposes GTM / GA4 / Facebook Pixel IDs as meta tags for easy discovery
+  This snippet is safe to include in <head> and only prints tags when values exist.
+{% endcomment %}
+
+{%- assign gsc = settings.google_site_verification | default: shop.metafields.custom.google_site_verification -%}
+{%- if gsc != blank -%}
+  <meta name="google-site-verification" content="{{ gsc }}">
+{%- endif -%}
+
+{%- assign gtm = settings.gtm_id | default: shop.metafields.custom.gtm_id -%}
+{%- if gtm != blank -%}
+  <meta name="gtm-container-id" content="{{ gtm }}">
+{%- endif -%}
+
+{%- assign ga4 = settings.ga4_id | default: shop.metafields.custom.ga4_id -%}
+{%- if ga4 != blank -%}
+  <meta name="ga4-measurement-id" content="{{ ga4 }}">
+{%- endif -%}
+
+{%- assign fb = settings.facebook_pixel_id | default: shop.metafields.custom.facebook_pixel_id -%}
+{%- if fb != blank -%}
+  <meta name="facebook-pixel-id" content="{{ fb }}">
+{%- endif -%}
+
+{%- comment %}
+  Developer note: If you manage IDs via .env files and an injector script, ensure those values are written into theme settings
+  (e.g. `google_site_verification`, `gtm_id`, `ga4_id`, `facebook_pixel_id`) or shop metafields so they appear here.
+{%- endcomment %}

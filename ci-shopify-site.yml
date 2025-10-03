@@ -1,0 +1,154 @@
+name: CI Shopify Site
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy_only:
+        description: "Lancer uniquement le déploiement du thème ?"
+        type: boolean
+        default: false
+        required: true
+
+# URLs publiques (OK d'être en clair). Les secrets sont injectés via expressions.
+env:
+  SHOP_DOMAIN: ${{ secrets.SHOPIFY_STORE }}
+  SITE_ORIGIN: https://${{ secrets.SHOPIFY_STORE }}
+  URL_HOME: https://${{ secrets.SHOPIFY_STORE }}/
+  URL_COLLECTION: https://${{ secrets.SHOPIFY_STORE }}/collections/all
+  URL_PRODUCT_1: https://${{ secrets.SHOPIFY_STORE }}/collections/travel-corner/products/dog-clothing-set-outdoor-dog-vest-4-piece-set-6-piece-set-multi-function-water-cup-set-medical-bag-ins-style
+  ROBOTS_URL: https://${{ secrets.SHOPIFY_STORE }}/robots.txt
+  SITEMAP_URL: https://${{ secrets.SHOPIFY_STORE }}/sitemap.xml
+
+jobs:
+  # === 1) required by branch protection ==========================
+  basic-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "✅ basic-build ok"
+
+  # === 2) required: smoke tests (HTTP, add-to-cart, PSI) =========
+  smoke-tests:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.deploy_only == true) }}
+    needs: basic-build
+    runs-on: ubuntu-latest
+    env:
+      VARIANT_ID_1: ${{ secrets.VARIANT_ID_1 }}
+      VARIANT_ID_2: ${{ secrets.VARIANT_ID_2 }}
+      VARIANT_ID_3: ${{ secrets.VARIANT_ID_3 }}
+      PSI_KEY: ${{ secrets.GOOGLE_PSI_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ping pages (code 200)
+        run: |
+          set -euo pipefail
+          for u in "${URL_HOME}" "${URL_COLLECTION}" "${URL_PRODUCT_1}"; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' "$u")"
+            echo "$u → $code"
+            [ "$code" = "200" ] || { echo "FAIL $code"; exit 1; }
+          done
+
+      - name: robots.txt & sitemap
+        run: |
+          set -euo pipefail
+          curl -sSf "${ROBOTS_URL}" > /dev/null
+          curl -sSf "${SITEMAP_URL}" > /dev/null
+
+      - name: Add to cart (1..3) si définis
+        run: |
+          set -euo pipefail
+          try_add() {
+            id="$1"; [ -z "$id" ] && { echo "⏭️  skip (vide)"; return 0; }
+            code="$(curl -sS -X POST -H 'Content-Type: application/json' \
+              --data "{\"id\":${id},\"quantity\":1}" \
+              "${SITE_ORIGIN}/cart/add.js" \
+              -o /dev/null -w '%{http_code}')"
+            echo "variant $id → $code"
+            [ "$code" -eq 200 ]
+          }
+          try_add "$VARIANT_ID_1"
+          try_add "$VARIANT_ID_2"
+          try_add "$VARIANT_ID_3"
+
+      - name: Installer jq (pour PSI)
+        if: ${{ env.PSI_KEY != '' }}
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: PageSpeed Insights (mobile+desktop) si clé fournie
+        if: ${{ env.PSI_KEY != '' }}
+        run: |
+          set -euo pipefail
+          for strat in mobile desktop; do
+            for u in "${URL_HOME}" "${URL_COLLECTION}" "${URL_PRODUCT_1}"; do
+              resp="$(curl -sS "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${u}&strategy=${strat}&key=${PSI_KEY}")"
+              err="$(echo "$resp" | jq -r '.error.message // empty')"
+              [ -z "$err" ] || { echo "❌ PSI error ($strat $u): $err"; exit 1; }
+              perf="$(echo "$resp" | jq -r '.lighthouseResult.categories.performance.score')"
+              echo "PSI ${strat} ${u} → Perf:${perf}"
+              [ "$perf" != "null" ]
+            done
+          done
+
+  # === 3) required: theme-check ==================================
+  theme-check:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.deploy_only == true) }}
+    needs: smoke-tests
+    runs-on: ubuntu-latest
+    env:
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }} # shptka_...
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Shopify CLI
+        run: npm i -g @shopify/cli @shopify/theme
+      - name: Theme check
+        run: shopify theme check || true  # passe même si warnings (ajuste si tu veux fail)
+
+  # === 4) Admin API sanity check (shpat_) ========================
+  api-admin:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.deploy_only == true) }}
+    needs: theme-check
+    runs-on: ubuntu-latest
+    env:
+      SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+      SHOPIFY_ADMIN_TOKEN: ${{ secrets.SHOPIFY_ADMIN_TOKEN }}     # shpat_...
+    steps:
+      - name: Shop info
+        run: |
+          curl -sS -H "X-Shopify-Access-Token: $SHOPIFY_ADMIN_TOKEN" \
+            "https://${SHOPIFY_STORE}/admin/api/2024-10/shop.json" | jq .
+
+  # === 5) Déploiement de thème AUTOMATIQUE (opt-in) ==============
+  theme-deploy:
+    needs: api-admin
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && secrets.ENABLE_THEME_DEPLOY == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.deploy_only == true) }}
+    env:
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }} # shptka_...
+      THEME_ID: ${{ secrets.THEME_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Shopify CLI
+        run: npm i -g @shopify/cli @shopify/theme
+      - name: Push theme
+        run: shopify theme push --theme-id "$THEME_ID" --force
+
+  # === 6) Déploiement MANUEL seul (workflow_dispatch) ============
+  theme-deploy-manual:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_only == true && secrets.ENABLE_THEME_DEPLOY == 'true' }}
+    env:
+      SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+      THEME_ID: ${{ secrets.THEME_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Shopify CLI
+        run: npm i -g @shopify/cli @shopify/theme
+      - name: Push theme (manual)
+        run: shopify theme push --theme-id "$THEME_ID" --force

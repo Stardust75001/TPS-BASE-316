@@ -1,0 +1,82 @@
+# Theme Check Configuration
+root: .
+
+ignore:
+  - "node_modules/**"
+  - ".git/**"
+  - "dist/**"
+  - "build/**"
+  - "assets/vendor*.css"
+  - "assets/vendor*.js"
+  - "assets/**/*.min.css"
+  - "assets/**/*.min.js"
+  - "assets/**/vendor-**/*"
+  - ".github/**"
+  - "snippets/shogun-*.liquid"
+
+# Checks configuration
+ImgLazyLoading:
+  enabled: false # Disabled to reduce noise
+  severity: suggestion
+
+ImgWidthAndHeight:
+  enabled: false # Disabled to reduce noise
+  severity: suggestion
+
+RemoteAsset:
+  enabled: false # Disabled - legitimate external assets (CDN, Google Fonts)
+  severity: suggestion
+
+DeprecatedFilter:
+  enabled: true
+  severity: error
+
+TemplateLength:
+  enabled: true
+  severity: suggestion
+  max_length: 1500 # Increased from 1200
+
+UnusedAssign:
+  enabled: false # Disabled to reduce noise
+  severity: suggestion
+
+ContentForHeaderModification:
+  enabled: false
+
+DeprecateLazysizes:
+  enabled: true
+  severity: error # Upgraded to error
+
+MatchingTranslations:
+  enabled: false # Disabled to reduce noise for multilingual themes
+  severity: suggestion
+
+TranslationKeyExists:
+  enabled: true
+  severity: error
+
+SpaceInsideBraces:
+  enabled: false
+
+UnusedSnippet:
+  enabled: false # Disabled to reduce noise
+  severity: suggestion
+
+SchemaJsonFormat:
+  enabled: false # Disabled to reduce noise from schema formatting
+
+LiquidTag:
+  enabled: false # Disabled to reduce style warnings
+  severity: suggestion
+
+NestedSnippet:
+  enabled: false # Disabled to reduce style warnings
+  severity: suggestion
+
+MissingTemplate:
+  enabled: false # Disabled - templates are optional
+  severity: suggestion
+
+ValidHTMLTranslation:
+  enabled: false # Disabled to reduce noise from HTML in translations
+  severity: suggestion

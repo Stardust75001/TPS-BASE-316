@@ -1,0 +1,16 @@
+{
+  "name": "pantone-shopify-updater",
+  "version": "1.0.0",
+  "description": "Script automatique pour remplir les champs hex des metaobjects Pantone dans Shopify",
+  "main": "pantone-fill-hex.cjs",
+  "scripts": {
+    "update": "node pantone-fill-hex.cjs",
+    "preview": "node pantone-fill-hex.cjs --dry",
+    "force": "node pantone-fill-hex.cjs --force"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "csv-parse": "^5.4.0",
+    "dotenv": "^16.3.1"
+  }
+}

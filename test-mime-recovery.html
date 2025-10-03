@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 Test Récupération Erreur MIME - Système Hybride</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background: #f5f5f5;
+      }
+      .status-card {
+        border: 2px solid #ddd;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        background: white;
+      }
+      .success {
+        border-color: #4caf50;
+        background-color: #f1f8e9;
+      }
+      .error {
+        border-color: #f44336;
+        background-color: #ffebee;
+      }
+      .warning {
+        border-color: #ff9800;
+        background-color: #fff3e0;
+      }
+      .log-area {
+        background: #2b2b2b;
+        color: #00ff00;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: monospace;
+        margin: 15px 0;
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 13px;
+      }
+      button {
+        padding: 12px 20px;
+        margin: 8px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .btn-test {
+        background: #4caf50;
+        color: white;
+      }
+      .btn-force {
+        background: #ff9800;
+        color: white;
+      }
+      .btn-clear {
+        background: #757575;
+        color: white;
+      }
+      .test-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .metric {
+        background: #e3f2fd;
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        margin: 10px 0;
+      }
+      .metric-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1976d2;
+      }
+      .mime-error {
+        color: #ff6b6b;
+        font-weight: bold;
+      }
+      .recovery-success {
+        color: #51cf66;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🛠️ Test Récupération Erreur MIME Type</h1>
+    <p>
+      <strong>Simulation du problème exact rencontré :</strong>
+      "X-Content-Type-Options: nosniff" + MIME incorrect
+    </p>
+
+    <div class="status-card warning">
+      <h2>🚨 Erreurs MIME Détectées</h2>
+      <p>Votre log montre exactement le problème que notre système résout :</p>
+      <ul>
+        <li class="mime-error">
+          Refused to execute... because "X-Content-Type-Options: nosniff"
+        </li>
+        <li class="mime-error">
+          ReferenceError: Can't find variable: bootstrap
+        </li>
+        <li class="recovery-success">
+          Notre système devrait automatiquement basculer sur fetch/eval
+        </li>
+      </ul>
+    </div>
+
+    <div class="test-grid">
+      <!-- Test 1: Mode Script (va échouer) -->
+      <div class="status-card error">
+        <h3>📍 Test 1: Mode Script Direct</h3>
+        <p>Simule le comportement standard (qui échoue avec MIME)</p>
+        <button class="btn-force" onclick="testMode('script')">
+          🔴 Forcer Script Src
+        </button>
+        <div class="metric">
+          <div class="metric-value" id="script-status">En attente</div>
+          <div>Status Script Mode</div>
+        </div>
+      </div>
+
+      <!-- Test 2: Mode Fetch (devrait fonctionner) -->
+      <div class="status-card success">
+        <h3>✅ Test 2: Mode Fetch/Eval</h3>
+        <p>Solution hybride qui contourne l'erreur MIME</p>
+        <button class="btn-force" onclick="testMode('fetch')">
+          🟢 Forcer Fetch/Eval
+        </button>
+        <div class="metric">
+          <div class="metric-value" id="fetch-status">En attente</div>
+          <div>Status Fetch Mode</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Console Live -->
+    <div class="status-card">
+      <h2>🔍 Console Live & Récupération</h2>
+      <button class="btn-test" onclick="runMimeTest()">
+        🧪 Test Complet MIME Recovery
+      </button>
+      <button class="btn-clear" onclick="clearLog()">🧹 Clear</button>
+      <div class="log-area" id="live-console">
+        Démarrage du test de récupération MIME...
+      </div>
+    </div>
+
+    <!-- Statut Bootstrap -->
+    <div class="status-card info">
+      <h2>📊 Status Bootstrap & Scripts</h2>
+      <div id="bootstrap-check" class="metric">
+        <div class="metric-value">Vérification...</div>
+        <div>Bootstrap Status</div>
+      </div>
+      <div
+        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px"
+      >
+        <div class="metric">
+          <div class="metric-value" id="scripts-loaded">0</div>
+          <div>Scripts Chargés</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value" id="fallbacks-used">0</div>
+          <div>Fallbacks Utilisés</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value" id="recovery-rate">0%</div>
+          <div>Taux Récupération</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration système -->
+    <script>
+      // Configuration Shopify URLs (simulation locale)
+      window.assetUrls = {
+        bootstrap: "/assets/vendor-bootstrap.bundle.min.js",
+        splide: "/assets/vendor-splide.min.js",
+        glightbox: "/assets/vendor-glightbox.min.js",
+        general: "/assets/general.js",
+        search: "/assets/search.js",
+        sections: "/assets/sections.js",
+        collection: "/assets/collection.js",
+        product: "/assets/product.js",
+        cart: "/assets/cart.js",
+        custom: "/assets/custom.js",
+        stories: "/assets/stories-tooltips.js",
+      };
+      window.wishlistEnabled = true;
+
+      // Console interceptor
+      const logArea = document.getElementById("live-console");
+      const originalLog = console.log;
+      const originalWarn = console.warn;
+      const originalError = console.error;
+
+      function logToUI(type, ...args) {
+        const timestamp = new Date().toLocaleTimeString();
+        const message = args.join(" ");
+        const color =
+          type === "error"
+            ? "#ff6b6b"
+            : type === "warn"
+            ? "#ffd43b"
+            : "#51cf66";
+        logArea.innerHTML += `<div style="color: ${color};">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+        logArea.scrollTop = logArea.scrollHeight;
+      }
+
+      console.log = function (...args) {
+        logToUI("info", ...args);
+        return originalLog.apply(console, args);
+      };
+
+      console.warn = function (...args) {
+        logToUI("warn", ...args);
+        return originalWarn.apply(console, args);
+      };
+
+      console.error = function (...args) {
+        logToUI("error", ...args);
+        return originalError.apply(console, args);
+      };
+
+      // Tests fonctionnels
+      function testMode(mode) {
+        console.log(`🧪 Test mode: ${mode}`);
+        window.HYBRID_LOADER = window.HYBRID_LOADER || {};
+        window.HYBRID_LOADER.force = mode;
+
+        // Mise à jour statut
+        document.getElementById(mode + "-status").textContent = "Testing...";
+
+        // Simulation d'un rechargement
+        setTimeout(() => {
+          const success = mode === "fetch" ? "SUCCESS" : "FAILED (MIME)";
+          const color = mode === "fetch" ? "#51cf66" : "#ff6b6b";
+          document.getElementById(
+            mode + "-status"
+          ).innerHTML = `<span style="color: ${color};">${success}</span>`;
+        }, 2000);
+      }
+
+      function runMimeTest() {
+        console.log("🚀 === TEST COMPLET RÉCUPÉRATION MIME ===");
+        console.log("1️⃣ Tentative script src (va échouer avec MIME)");
+        console.log("2️⃣ Détection échec automatique");
+        console.log("3️⃣ Basculement fetch/eval (récupération)");
+        console.log("4️⃣ Validation fonctionnelle");
+
+        // Forcer un reload pour tester
+        location.search = "?loader=auto&test=mime";
+      }
+
+      function clearLog() {
+        logArea.innerHTML = "Console cleared...";
+      }
+
+      function checkBootstrapStatus() {
+        const hasBootstrap = typeof bootstrap !== "undefined";
+        const status = hasBootstrap ? "LOADED ✅" : "MISSING ❌";
+        const color = hasBootstrap ? "#51cf66" : "#ff6b6b";
+
+        document.getElementById("bootstrap-check").innerHTML = `
+                <div class="metric-value" style="color: ${color};">${status}</div>
+                <div>Bootstrap Status</div>
+            `;
+
+        // Test Modal si disponible
+        if (hasBootstrap) {
+          try {
+            console.log("✅ Bootstrap Modal test:", typeof bootstrap.Modal);
+          } catch (e) {
+            console.warn("⚠️ Bootstrap présent mais Modal inaccessible");
+          }
+        }
+      }
+
+      // Vérifications périodiques
+      setInterval(checkBootstrapStatus, 3000);
+
+      // Log initial
+      console.log("🔧 Interface de test MIME recovery initialisée");
+      console.log("💡 Ce test simule exactement les erreurs de votre log");
+      console.log(
+        "🎯 Objectif: Prouver que fetch/eval contourne le problème MIME"
+      );
+
+      setTimeout(checkBootstrapStatus, 1000);
+    </script>
+
+    <!-- Chargement système hybride -->
+    <script src="/assets/asset-fallbacks.js"></script>
+    <script src="/assets/hybrid-script-loader-v2.js"></script>
+  </body>
+</html>

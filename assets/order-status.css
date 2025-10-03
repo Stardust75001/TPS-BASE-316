@@ -1,0 +1,27 @@
+/* Order Status CSS - Styles pour les pages de statut de commande */
+
+.order-status {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.order-status .order-details {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.order-status .order-number {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.order-status .shipping-info {
+  margin-top: 2rem;
+}
+
+.order-status .btn-primary {
+  margin-top: 2rem;
+}

@@ -1,0 +1,45 @@
+extends: shopify
+
+exclude_patterns:
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - ".github/**"
+  - "assets/**/*.min.css"
+  - "assets/**/*.min.js"
+  - "assets/**/vendor-**/*"
+  - "assets/vendor-*.css"
+  - "assets/vendor-*.js"
+  - "snippets/**/shogun-*.liquid"
+
+checks:
+  SpaceInsideBraces:
+    enabled: false
+  TemplateLength:
+    enabled: true
+    severity: suggestion
+    max_length: 1200
+  UnusedAssign:
+    severity: suggestion
+  UnusedSnippet:
+    severity: suggestion
+  ContentForHeaderModification:
+    enabled: false
+  ImgWidthAndHeight:
+    severity: suggestion
+  ImgLazyLoading:
+    severity: suggestion
+  RemoteAsset:
+    severity: suggestion
+  DeprecatedFilter:
+    severity: suggestion
+
+  TranslationKeyExists:
+    enabled: true
+    severity: error
+
+  MatchingTranslations:
+    severity: suggestion
+
+  SchemaJsonFormat:
+    severity: suggestion

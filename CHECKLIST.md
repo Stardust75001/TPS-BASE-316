@@ -1,0 +1,11 @@
+# ✅ Shopify Debug & QA Checklist
+- [ ] Theme Check OK
+- [ ] JSON schema/locales OK
+- [ ] Console sans erreurs
+- [ ] A11y: alt/Hx/focus
+- [ ] Images: LCP fetchpriority, lazy ailleurs
+- [ ] Perf Lighthouse >90 (mobile/desktop)
+- [ ] Core Web Vitals OK
+- [ ] SEO: title/desc/canonique
+- [ ] Pas de render dans boucles lourdes
+- [ ] Déploiement via thème de préprod

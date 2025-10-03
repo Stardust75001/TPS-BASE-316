@@ -1,0 +1,185 @@
+{% comment %} Language selector dropdown {% endcomment %}
+{% if shop.published_locales.size > 1 %}
+  <div class="language-dropdown" data-language-dropdown>
+    <style>
+      .language-dropdown {
+        position: relative;
+      }
+      .language-dropdown .lang-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 0.375rem;
+        background: transparent;
+        color: currentColor;
+        cursor: pointer;
+      }
+      .language-dropdown .lang-toggle:focus {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+      }
+      .language-dropdown .flag {
+        display: inline-flex;
+        width: 16px;
+        height: 16px;
+      }
+      .language-dropdown [role='listbox'] {
+        position: absolute;
+        z-index: 20;
+        margin-top: 0.25rem;
+        min-width: 12rem;
+        background: #181818;
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.375rem;
+        padding: 0.25rem;
+        display: none;
+      }
+      .language-dropdown [role='listbox'][data-open='true'] {
+        display: block;
+      }
+      .language-dropdown [role='option'] {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+      }
+      .language-dropdown [role='option'][aria-selected='true'],
+      .language-dropdown [role='option']:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .language-dropdown .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap;
+      }
+    </style>
+
+    {% form 'localization' %}
+      <input
+        type="hidden"
+        name="return_to"
+        value="{{ request.path }}{% if request.query_string != blank %}?{{ request.query_string }}{% endif %}"
+      >
+
+      <button type="button" class="lang-toggle" aria-haspopup="listbox" aria-expanded="false" data-lang-toggle>
+        {% assign current_code = localization.language.iso_code | slice: 0, 2 | downcase %}
+        <span class="flag" aria-hidden="true">
+          {% assign flag_asset = 'flag-' | append: current_code | append: '.png' %}
+          {% comment %} Try to load flag, fallback to emoji if not found {% endcomment %}
+          <picture>
+            <img
+              src="{{ flag_asset | file_url }}"
+              width="16"
+              height="16"
+              alt=""
+              onerror="this.style.display='none'; this.parentNode.innerHTML='🌐';"
+            >
+          </picture>
+        </span>
+        <span data-current-label>{{ localization.language.endonym_name }}</span>
+      </button>
+
+      <ul class="lang-list" role="listbox" aria-label="Languages" data-open="false" id="language-list" data-lang-list>
+        {% for locale in localization.available_languages %}
+          {% assign code2 = locale.iso_code | slice: 0, 2 | downcase %}
+          <li
+            role="option"
+            aria-selected="{% if locale.iso_code == localization.language.iso_code %}true{% else %}false{% endif %}"
+            data-locale-code="{{ locale.iso_code }}"
+          >
+            <span class="flag" aria-hidden="true">
+              {% assign flag_asset = 'flag-' | append: code2 | append: '.png' %}
+              {% comment %} Try to load flag, fallback to emoji if not found {% endcomment %}
+              <picture>
+                <img
+                  src="{{ flag_asset | file_url }}"
+                  width="16"
+                  height="16"
+                  alt=""
+                  onerror="this.style.display='none'; this.parentNode.innerHTML='🌐';"
+                >
+              </picture>
+            </span>
+            <span>{{ locale.endonym_name }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <noscript>
+        <div>
+          <label class="visually-hidden" for="locale-select">Language</label>
+          <select id="locale-select" name="locale_code" onchange="this.form.submit()">
+            {% for locale in localization.available_languages %}
+              <option
+                value="{{ locale.iso_code }}"
+                {% if locale.iso_code == localization.language.iso_code %}
+                  selected
+                {% endif %}
+              >
+                {{ locale.endonym_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </noscript>
+    {% endform %}
+
+    <script>
+      (function () {
+        const container = document.currentScript.closest('[data-language-dropdown]');
+        if (!container) return;
+
+        const form = container.querySelector('form');
+        const hidden = form.querySelector('input[name="locale_code"]');
+        const toggle = container.querySelector('[data-lang-toggle]');
+        const list = container.querySelector('[data-lang-list]');
+        const label = container.querySelector('[data-current-label]');
+
+        function openList() {
+          list.setAttribute('data-open', 'true');
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+        function closeList() {
+          list.setAttribute('data-open', 'false');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+        function toggleList() {
+          list.getAttribute('data-open') === 'true' ? closeList() : openList();
+        }
+
+        toggle.addEventListener('click', toggleList);
+
+        list.querySelectorAll('[data-locale-code]').forEach(function (item) {
+          item.addEventListener('click', function () {
+            const code = this.getAttribute('data-locale-code');
+            if (hidden) {
+              hidden.value = code;
+            } else {
+              const newHidden = document.createElement('input');
+              newHidden.type = 'hidden';
+              newHidden.name = 'locale_code';
+              newHidden.value = code;
+              form.appendChild(newHidden);
+            }
+            form.submit();
+          });
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!container.contains(e.target)) closeList();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeList();
+        });
+      })();
+    </script>
+  </div>
+{% endif %}

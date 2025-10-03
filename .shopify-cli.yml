@@ -1,0 +1,10 @@
+environments:
+  live:
+    store: f6d72e-0f.myshopify.com
+    theme_id: 187147125084   # TPS BASE (live)
+  temp:
+    store: f6d72e-0f.myshopify.com
+    theme_id: 187257684316   # TPS BASE TEMP
+  dev:
+    store: f6d72e-0f.myshopify.com
+    theme_id: 187310473564   # Development (58b14d-mac)

@@ -1,0 +1,43 @@
+Checking . ...
+[DEPRECATION] Template.register_tag is deprecated. Use Environment#register_tag instead. Called from /Users/asc/.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/theme-check-1.15.0/lib/theme_check/tags.rb:214:in `register_tag'
+[34msections/map.liquid:34[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map_address' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map_address' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:41[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map_phone' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map_phone' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:48[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map_email' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map_email' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:55[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map_hours' does not have a matching entry in 'locales/en.default.json'.
+	<strong>{{ 'general.map_hours' | t }}:</strong><br>
+	            ^^^^^^^^^^^^^^^^^
+
+[34msections/map.liquid:83[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.map_api_key_missing' does not have a matching entry in 'locales/en.default.json'.
+	<p class="text-muted">{{ 'general.map_api_key_missing' | t }}</p>
+	                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:30[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search_title_products' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search_title_products' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:133[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search_title_collections' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search_title_collections' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:152[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search_title_pages' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search_title_pages' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34msections/search-predictive.liquid:171[0m: [31merror[0m: [33mTranslationKeyExists[0m: 'general.offcanvas_search_title_articles' does not have a matching entry in 'locales/en.default.json'.
+	{{ 'general.offcanvas_search_title_articles' | t }}
+	    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[34mfinal_theme_check.json[0m: [31merror[0m: [33mValidJson[0m: Invalid syntax in JSON.
+
+[34mtheme_results.json[0m: [31merror[0m: [33mValidJson[0m: Invalid syntax in JSON.
+
+337 files inspected, [31m11 offenses[0m detected, [33m9 offenses[0m auto-correctable

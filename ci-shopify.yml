@@ -1,0 +1,44 @@
+name: CI Shopify Site
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  basic-build: # ✅ correspond à ton check attendu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Basic build step
+        run: echo "✅ Basic build ok"
+
+  smoke-tests: # ✅ correspond au check attendu
+    runs-on: ubuntu-latest
+    needs: basic-build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run smoke tests (add-to-cart + PSI)
+        run: |
+          chmod +x ./load-env.sh
+          ./load-env.sh all
+        env:
+          SITE_ORIGIN: https://${{ secrets.SHOPIFY_STORE }}
+          VARIANT_ID_1: ${{ secrets.VARIANT_ID_1 }}
+          VARIANT_ID_2: ${{ secrets.VARIANT_ID_2 }}
+          VARIANT_ID_3: ${{ secrets.VARIANT_ID_3 }}
+          GOOGLE_PSI_API_KEY: ${{ secrets.GOOGLE_PSI_API_KEY }}
+
+  theme-check: # ✅ correspond au check attendu
+    runs-on: ubuntu-latest
+    needs: smoke-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Theme check
+        run: |
+          npm install -g @shopify/cli @shopify/theme
+          shopify theme check
+        env:
+          SHOPIFY_FLAG_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}

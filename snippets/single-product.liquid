@@ -1,0 +1,208 @@
+{% comment %}
+  Single Product Snippet
+
+  Usage:
+  {% render 'single-product', product: product %}
+
+  Parameters:
+  - product: The product object
+  - show_vendor: Boolean to show vendor (optional)
+  - show_type: Boolean to show product type (optional)
+  - show_sku: Boolean to show SKU (optional)
+{% endcomment %}
+
+{% assign current_variant = product.selected_or_first_available_variant %}
+
+<div class="single-product" data-product-id="{{ product.id }}">
+  <div class="row">
+    <!-- Product Images -->
+    <div class="col-lg-6">
+      <div class="product-media">
+        {% if product.featured_media %}
+          <div class="product-media-main mb-3">
+            <img
+              src="{{ product.featured_media | image_url: width: 800 }}"
+              alt="{{ product.featured_media.alt | escape }}"
+              class="img-fluid"
+              width="800"
+              height="800"
+              loading="lazy"
+            >
+          </div>
+        {% endif %}
+
+        {% if product.media.size > 1 %}
+          <div class="product-media-thumbs">
+            <div class="row g-2">
+              {% for media in product.media limit: 6 %}
+                <div class="col-2">
+                  <img
+                    src="{{ media | image_url: width: 100 }}"
+                    alt="{{ media.alt | escape }}"
+                    class="img-fluid rounded cursor-pointer"
+                    width="100"
+                    height="100"
+                    loading="lazy"
+                    data-media-id="{{ media.id }}"
+                  >
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-lg-6">
+      <div class="product-info">
+        {% if show_vendor and product.vendor != blank %}
+          <p class="product-vendor text-muted small mb-1">{{ product.vendor }}</p>
+        {% endif %}
+
+        <h1 class="product-title h3 mb-3">{{ product.title }}</h1>
+
+        <div class="product-price mb-3">
+          <span class="price h4 mb-0" data-product-price>
+            {{ current_variant.price | money }}
+          </span>
+          {% if current_variant.compare_at_price > current_variant.price %}
+            <span class="compare-price text-muted text-decoration-line-through ms-2">
+              {{ current_variant.compare_at_price | money }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% if product.description != blank %}
+          <div class="product-description rte mb-4">
+            {{ product.description | truncate: 200 }}
+          </div>
+        {% endif %}
+
+        {% if show_type and product.type != blank %}
+          <p class="product-type mb-2">
+            <strong>{{ 'product.type' | t }}:</strong> {{ product.type }}
+          </p>
+        {% endif %}
+
+        {% if show_sku and current_variant.sku != blank %}
+          <p class="product-sku mb-2">
+            <strong>{{ 'product.sku' | t }}:</strong>
+            <span data-variant-sku>{{ current_variant.sku }}</span>
+          </p>
+        {% endif %}
+
+        <!-- Availability -->
+        <div class="product-availability mb-3">
+          {% if current_variant.available %}
+            <span class="badge bg-success">{{ 'product.in_stock' | t }}</span>
+          {% else %}
+            <span class="badge bg-danger">{{ 'product.out_of_stock' | t }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Quick Add to Cart -->
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" class="product-form">
+          <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+          {% if product.variants.size > 1 %}
+            <div class="product-options mb-3">
+              {% for option in product.options_with_values %}
+                <div class="mb-2">
+                  <label class="form-label">{{ option.name }}</label>
+                  <select
+                    name="options[{{ option.name | escape }}]"
+                    class="form-select"
+                    data-option-select
+                  >
+                    {% for value in option.values %}
+                      <option
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}
+                          selected
+                        {% endif %}
+                      >
+                        {{ value }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="quantity-selector mb-3">
+            <label class="form-label">{{ 'product.quantity' | t }}</label>
+            <div class="input-group" style="max-width: 120px;">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                data-quantity-decrease
+                aria-label="{{ 'general.accessibility.decrease_qty' | t }}"
+              >
+                <i class="bi bi-dash"></i>
+              </button>
+              <input
+                type="number"
+                name="quantity"
+                value="1"
+                min="1"
+                class="form-control text-center"
+                data-quantity-input
+              >
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                data-quantity-increase
+                aria-label="{{ 'general.accessibility.increase_qty' | t }}"
+              >
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            {% unless current_variant.available %}
+              disabled
+            {% endunless %}
+          >
+            {% if current_variant.available %}
+              {{ 'product.add_to_cart' | t }}
+            {% else %}
+              {{ 'product.out_of_stock' | t }}
+            {% endif %}
+          </button>
+        </form>
+
+        <a href="{{ product.url }}" class="btn btn-outline-secondary w-100 mt-2">
+          {{ 'product.view_details' | t }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Simple quantity controls
+    const decreaseBtn = document.querySelector('[data-quantity-decrease]');
+    const increaseBtn = document.querySelector('[data-quantity-increase]');
+    const quantityInput = document.querySelector('[data-quantity-input]');
+
+    if (decreaseBtn && increaseBtn && quantityInput) {
+      decreaseBtn.addEventListener('click', function () {
+        const current = parseInt(quantityInput.value) || 1;
+        if (current > 1) {
+          quantityInput.value = current - 1;
+        }
+      });
+
+      increaseBtn.addEventListener('click', function () {
+        const current = parseInt(quantityInput.value) || 1;
+        quantityInput.value = current + 1;
+      });
+    }
+  });
+</script>

@@ -1,0 +1,125 @@
+{% comment %}
+  Cloudflare Turnstile Anti-Bot Protection
+  Usage: {% render 'turnstile' %}
+{% endcomment %}
+
+{% comment %} Resolve turnstile site key from settings or injected env {% endcomment %}
+{%- assign ts_key = settings.turnstile_site_key | default: '' -%}
+{%- assign ts_theme = settings.turnstile_theme | default: 'auto' -%}
+{%- assign ts_size = settings.turnstile_size | default: 'normal' -%}
+
+{%- if ts_key == '' -%}
+  {%- comment -%} Try to read from window.analyticsConfig at runtime (client fallback) {%- endcomment -%}
+  <script>
+    (function () {
+      var tk = null;
+      try {
+        if (window.analyticsConfig && window.analyticsConfig.turnstile_site_key)
+          tk = window.analyticsConfig.turnstile_site_key;
+      } catch (e) {}
+      try {
+        if (!tk && window.analyticsEnvConfig) {
+          // support both lowercase key (injected by analytics-env-injector) and uppercase env style
+          if (window.analyticsEnvConfig.turnstile_site_key) {
+            tk = window.analyticsEnvConfig.turnstile_site_key;
+          } else if (window.analyticsEnvConfig.TURNSTILE_SITE_KEY) {
+            tk = window.analyticsEnvConfig.TURNSTILE_SITE_KEY;
+          }
+        }
+      } catch (e) {}
+      try {
+        // final fallback: meta tag in head (in case inline script didn't execute)
+        if (!tk) {
+          var meta = document.querySelector('meta[name="turnstile-site-key"]');
+          if (meta && meta.content) tk = meta.content;
+        }
+      } catch (e) {}
+      if (!tk) return;
+      // Load the Turnstile script once
+      if (!document.querySelector('script[src^="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
+        var s = document.createElement('script');
+        s.async = true;
+        s.defer = true;
+        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        document.head.appendChild(s);
+      }
+      // Render a placeholder div; the library will replace it when loaded
+      var wrapper = document.currentScript.parentNode;
+      var div = document.createElement('div');
+      div.className = 'cf-turnstile';
+      div.setAttribute('data-sitekey', tk);
+      div.setAttribute('data-theme', '{{ ts_theme }}');
+      div.setAttribute('data-size', '{{ ts_size }}');
+      div.setAttribute('data-callback', 'turnstileCallback');
+      div.setAttribute('data-error-callback', 'turnstileErrorCallback');
+      wrapper.insertBefore(div, document.currentScript);
+    })();
+  </script>
+  <script>
+    function turnstileCallback(token) {
+      try {
+        console.log('Turnstile verified:', token);
+        const forms = document.querySelectorAll('form[data-turnstile-protected]');
+        forms.forEach((form) => {
+          // ensure hidden input exists
+          let hidden = form.querySelector('input[name="cf-turnstile-response"]');
+          if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'cf-turnstile-response';
+            form.appendChild(hidden);
+          }
+          hidden.value = token;
+
+          // enable submit button(s)
+          const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+          if (submitBtn) submitBtn.disabled = false;
+        });
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    function turnstileErrorCallback() {
+      console.error('Turnstile verification failed');
+    }
+  </script>
+{%- else -%}
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <div
+    class="cf-turnstile"
+    data-sitekey="{{ settings.turnstile_site_key }}"
+    data-theme="{{ settings.turnstile_theme | default: 'auto' }}"
+    data-size="{{ settings.turnstile_size | default: 'normal' }}"
+    data-callback="turnstileCallback"
+    data-error-callback="turnstileErrorCallback"
+  ></div>
+
+  <script>
+    function turnstileCallback(token) {
+      console.log('Turnstile verified:', token);
+      const forms = document.querySelectorAll('form[data-turnstile-protected]');
+      forms.forEach((form) => {
+        // ensure hidden input exists
+        let hidden = form.querySelector('input[name="cf-turnstile-response"]');
+        if (!hidden) {
+          hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = 'cf-turnstile-response';
+          form.appendChild(hidden);
+        }
+        hidden.value = token;
+
+        const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    function turnstileErrorCallback() {
+      console.error('Turnstile verification failed');
+      // Keep form disabled
+    }
+  </script>
+{%- endif -%}

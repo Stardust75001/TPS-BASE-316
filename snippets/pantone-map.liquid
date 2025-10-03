@@ -1,0 +1,123 @@
+{%- comment -%}
+  Dictionnaire couleur -> handle metaobject "pantone_color"
+  Usage :
+    {% render 'pantone-map', color: variant.option1, expose: 'pantone_handle' %}
+    → renvoie le handle Pantone ou '' si non trouvé
+{%- endcomment -%}
+
+{%- capture raw_pairs -%}
+noir:pantone-process-black-c,
+black:pantone-process-black-c,
+schwarz:pantone-process-black-c,
+black-6-piece-set:pantone-process-black-c,
+black-4-piece-set:pantone-process-black-c,
+
+blanc:pantone-cool-gray-1-c,
+white:pantone-cool-gray-1-c,
+weiß:pantone-cool-gray-1-c,
+
+gris:pantone-cool-gray-7-c,
+gray:pantone-cool-gray-7-c,
+grau:pantone-cool-gray-7-c,
+gris clair:pantone-cool-gray-3-c,
+light gray:pantone-cool-gray-3-c,
+hellgrau:pantone-cool-gray-3-c,
+gris foncé:pantone-cool-gray-11-c,
+dark gray:pantone-cool-gray-11-c,
+dunkelgrau:pantone-cool-gray-11-c,
+
+rouge:pantone-186-c,
+red:pantone-186-c,
+rot:pantone-186-c,
+rouge foncé:pantone-200-c,
+dark red:pantone-200-c,
+dunkelrot:pantone-200-c,
+bordeaux:pantone-209-c,
+burgundy:pantone-209-c,
+
+orange:pantone-165-c,
+
+jaune:pantone-7406-c,
+yellow:pantone-7406-c,
+gelb:pantone-7406-c,
+
+bleu:pantone-300-c,
+blue:pantone-300-c,
+blau:pantone-300-c,
+bleu roi:pantone-286-c,
+royal blue:pantone-286-c,
+königsblau:pantone-286-c,
+bleu ciel:pantone-2995-c,
+sky blue:pantone-2995-c,
+himmelblau:pantone-2995-c,
+marine:pantone-7687-c,
+navy:pantone-7687-c,
+marineblau:pantone-7687-c,
+
+vert:pantone-354-c,
+green:pantone-354-c,
+grün:pantone-354-c,
+vert foncé:pantone-7724-c,
+dark green:pantone-7724-c,
+dunkelgrün:pantone-7724-c,
+vert clair:pantone-367-c,
+light green:pantone-367-c,
+hellgrün:pantone-367-c,
+
+rose:pantone-223-c,
+pink:pantone-223-c,
+rosa:pantone-223-c,
+rose clair:pantone-706-c,
+light pink:pantone-706-c,
+hellrosa:pantone-706-c,
+fuchsia:pantone-219-c,
+magenta:pantone-219-c,
+
+violet:pantone-2587-c,
+purple:pantone-2587-c,
+violett:pantone-2587-c,
+lavande:pantone-264-c,
+lavender:pantone-264-c,
+lavendel:pantone-264-c,
+
+beige:pantone-468-c,
+sand:pantone-468-c,
+sandfarben:pantone-468-c,
+marron:pantone-469-c,
+brown:pantone-469-c,
+braun:pantone-469-c,
+
+kaki:pantone-5773-c,
+khaki:pantone-5773-c,
+
+crème:pantone-7401-c,
+cream:pantone-7401-c,
+creme:pantone-7401-c,
+
+turquoise:pantone-312-c,
+türkis:pantone-312-c,
+
+or:pantone-7404-c,
+gold:pantone-7404-c,
+argent:pantone-877-c,
+silver:pantone-877-c,
+silber:pantone-877-c
+{%- endcapture -%}
+
+{%- assign pairs = raw_pairs | strip_newlines | replace: '  ', '' | split: ',' -%}
+{%- assign out = '' -%}
+
+{%- if expose == 'pantone_handle' -%}
+  {%- assign key = color | default: '' | downcase | strip | handleize -%}
+  {%- for pair in pairs -%}
+    {%- assign kv = pair | split: ':' -%}
+    {%- assign left = kv[0] | downcase | strip | handleize -%}
+    {%- if left == key -%}
+      {%- assign out = kv[1] | strip -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {{- out -}}
+{%- elsif expose == 'noop' -%}
+  {%- comment -%}no-op{%- endcomment -%}
+{%- endif -%}

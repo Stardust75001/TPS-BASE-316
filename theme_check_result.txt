@@ -1,0 +1,133 @@
+ConvertIncludeToRender:
+  severity: suggestion
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/convert_include_to_render.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+RequiredLayoutThemeObject:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/required_layout_theme_object.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+SyntaxError:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/syntax_error.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+TemplateLength:
+  severity: suggestion
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/template_length.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+  max_length: 1500
+  exclude_schema: true
+  exclude_stylesheet: true
+  exclude_javascript: true
+UnknownFilter:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/unknown_filter.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+MatchingSchemaTranslations:
+  severity: suggestion
+  categories: [:translation]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/matching_schema_translations.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+DefaultLocale:
+  severity: suggestion
+  categories: [:translation]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/default_locale.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+TranslationKeyExists:
+  severity: error
+  categories: [:translation]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/translation_key_exists.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+ValidJson:
+  severity: error
+  categories: [:json]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/valid_json.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+ValidSchema:
+  severity: error
+  categories: [:json]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/valid_schema.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+MissingRequiredTemplateFiles:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/missing_required_template_files.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+UndefinedObject:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/undefined_object.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+  exclude_snippets: true
+  config_type: default
+RequiredDirectories:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/required_directories.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+DeprecatedFilter:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/deprecated_filter.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+DeprecateLazysizes:
+  severity: error
+  categories: [:html, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/deprecate_lazysizes.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+DeprecateBgsizes:
+  severity: suggestion
+  categories: [:html, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/deprecate_bgsizes.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+MissingEnableComment:
+  severity: error
+  categories: []
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/missing_enable_comment.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+ParserBlockingJavaScript:
+  severity: error
+  categories: [:html, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/parser_blocking_javascript.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+ParserBlockingScriptTag:
+  severity: error
+  categories: [:liquid, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/parser_blocking_script_tag.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+AssetPreload:
+  severity: suggestion
+  categories: [:html, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/asset_preload.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+RemoteAsset:
+  severity: suggestion
+  categories: [:html, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/remote_asset.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+AssetUrlFilters:
+  severity: suggestion
+  categories: [:liquid, :performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/asset_url_filters.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+HtmlParsingError:
+  severity: error
+  categories: [:html]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/html_parsing_error.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+PaginationSize:
+  severity: suggestion
+  categories: [:performance]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/pagination_size.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]
+  min_size: 1
+  max_size: 50
+DeprecatedGlobalAppBlockType:
+  severity: error
+  categories: [:liquid]
+  doc: https://github.com/Shopify/theme-check/blob/main/docs/checks/deprecated_global_app_block_type.md
+  ignored_patterns: ["node_modules/**", ".git/**", "dist/**", "build/**", "assets/vendor*.css", "assets/vendor*.js", "assets/**/*.min.css", "assets/**/*.min.js", "assets/**/vendor-**/*", ".github/**", "snippets/shogun-*.liquid"]

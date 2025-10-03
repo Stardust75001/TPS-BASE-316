@@ -25,3 +25,9 @@ test-simple.cjs
 # also ignore dotenv files/locals
 .env
 .env.*
+.env.local
+*.backup
+secrets/
+config.local.*
+.env.master
+manage-tokens.sh

@@ -1,6 +1,6 @@
 const https = require("https");
 
-const TOKEN = "shpat_REDACTED";
+const TOKEN = process.env.SHOPIFY_ACCESS_TOKEN || "TOKEN_NOT_SET";
 const SHOP = "f6d72e-0f";
 const API_VERSION = "2025-01";
 
